@@ -1,0 +1,9 @@
+<OGRVRTDataSource>
+  <OGRVRTLayer name="node">
+    <SrcDataSource relativeToVRT="0" shared="1">node.shp</SrcDataSource>
+    <SrcLayer>node</SrcLayer>
+    <GeometryType>wkbPoint</GeometryType>
+    <LayerSRS>GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;WGS_1984&quot;,SPHEROID[&quot;WGS_84&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]]</LayerSRS>
+    <Field name="connectIDs" type="String" src="connectIDs" width="50"/>
+  </OGRVRTLayer>
+</OGRVRTDataSource>
