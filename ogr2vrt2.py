@@ -30,49 +30,54 @@
 # DEALINGS IN THE SOFTWARE.
 ###############################################################################
 
-try:
-    from osgeo import osr, ogr, gdal
-except ImportError:
-    import osr, ogr, gdal
-import codecs
-import string
+import sys
+
+from osgeo import ogr, gdal
+
 import sys
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8","YES")
-gdal.SetConfigOption("SHAPE_ENCODING","")
+gdal.SetConfigOption("SHAPE_ENCODING","utf-8")
 #############################################################################
 
 def GeomType2Name( type ):
-    if type == ogr.wkbUnknown:
-        return 'wkbUnknown'
-    elif type == ogr.wkbPoint:
-        return 'wkbPoint'
-    elif type == ogr.wkbLineString:
-        return 'wkbLineString'
-    elif type == ogr.wkbPolygon:
-        return 'wkbPolygon'
-    elif type == ogr.wkbMultiPoint:
-        return 'wkbMultiPoint'
-    elif type == ogr.wkbMultiLineString:
-        return 'wkbMultiLineString'
-    elif type == ogr.wkbMultiPolygon:
-        return 'wkbMultiPolygon'
-    elif type == ogr.wkbGeometryCollection:
-        return 'wkbGeometryCollection'
-    elif type == ogr.wkbNone:
-        return 'wkbNone'
-    elif type == ogr.wkbLinearRing:
-        return 'wkbLinearRing'
-    else:
-        return 'wkbUnknown'
+    flat_type = ogr.GT_Flatten(type)
+    dic = { ogr.wkbUnknown : ('wkbUnknown', '25D'),
+            ogr.wkbPoint : ('wkbPoint', '25D'),
+            ogr.wkbLineString : ('wkbLineString', '25D'),
+            ogr.wkbPolygon : ('wkbPolygon', '25D'),
+            ogr.wkbMultiPoint : ('wkbMultiPoint', '25D'),
+            ogr.wkbMultiLineString : ('wkbMultiLineString', '25D'),
+            ogr.wkbMultiPolygon : ('wkbMultiPolygon', '25D'),
+            ogr.wkbGeometryCollection : ('wkbGeometryCollection', '25D'),
+            ogr.wkbNone : ('wkbNone', ''),
+            ogr.wkbLinearRing : ('wkbLinearRing', ''),
+            ogr.wkbCircularString : ('wkbCircularString', 'Z'),
+            ogr.wkbCompoundCurve : ('wkbCompoundCurve', 'Z'),
+            ogr.wkbCurvePolygon : ('wkbCurvePolygon', 'Z'),
+            ogr.wkbMultiCurve : ('wkbMultiCurve', 'Z'),
+            ogr.wkbMultiSurface : ('wkbMultiSurface', 'Z'),
+            ogr.wkbCurve : ('wkbCurve', 'Z'),
+            ogr.wkbSurface : ('wkbSurface', 'Z'),
+            ogr.wkbPolyhedralSurface : ('wkbPolyhedralSurface', 'Z'),
+            ogr.wkbTIN : ('wkbTIN', 'Z'),
+            ogr.wkbTriangle : ('wkbTriangle', 'Z') }
+    ret = dic[flat_type][0]
+    if flat_type != type:
+        if ogr.GT_HasM(type):
+          if ogr.GT_HasZ(type):
+            ret += "ZM"
+          else:
+            ret += "M"
+        else:
+          ret += dic[flat_type][1]
+    return ret
 
 #############################################################################
 def Esc(x):
-    # print repr(x)
-    # return gdal.EscapeString( x, gdal.CPLES_XML )
-    return x.decode('cp936')
+    return gdal.EscapeString( x, gdal.CPLES_XML )
 
 #############################################################################
 def Usage():
@@ -89,22 +94,44 @@ def ogr2vrt(infile,outfile,argv=" "):
     schema=0
     feature_count=0
     extent=0
+    openoptions = []
     argv = argv.split(",")
-    if argv is None:
-        i = 1
-        while i < len(argv):
-            arg = argv[i]
-            if arg == 'relative':
-                relative = "1"
-            elif arg == 'schema':
-                schema = 1
-            elif arg == 'feature_count':
-                feature_count = 1
-            elif arg == 'extent':
-                extent = 1
-            else:
-                layer_list.append( arg )
-            i = i + 1
+    i = 1
+    while i < len(argv):
+        arg = argv[i]
+
+        if arg == '-relative':
+            relative = "1"
+
+        elif arg == '-schema':
+            schema = 1
+
+        elif arg == '-feature_count':
+            feature_count = 1
+
+        elif arg == '-extent':
+            extent = 1
+
+        elif arg == '-oo':
+            i += 1
+            openoptions.append(argv[i])
+
+        elif arg[0] == '-':
+            Usage()
+
+        elif infile is None:
+            infile = arg
+
+        elif outfile is None:
+            outfile = arg
+
+        else:
+            layer_list.append( arg )
+
+        i = i + 1
+
+    if outfile is None:
+        Usage()
 
     if schema and feature_count:
         sys.stderr.write('Ignoring -feature_count when used with -schema.\n')
@@ -117,19 +144,41 @@ def ogr2vrt(infile,outfile,argv=" "):
     #############################################################################
     # Open the datasource to read.
 
-    src_ds = ogr.Open( infile, update = 0 )
+    src_ds = gdal.OpenEx( infile, gdal.OF_VECTOR, open_options = openoptions )
 
     if schema:
         infile = '@dummy@'
 
     if len(layer_list) == 0:
-        for layer in src_ds:
-            layer_list.append( layer.GetLayerDefn().GetName() )
+        for lyr_idx in range(src_ds.GetLayerCount()):
+            layer_list.append( src_ds.GetLayer(lyr_idx).GetLayerDefn().GetName() )
 
     #############################################################################
     # Start the VRT file.
 
     vrt = '<OGRVRTDataSource>\n'
+
+
+    #############################################################################
+    # Metadata
+
+    mdd_list = src_ds.GetMetadataDomainList()
+    if mdd_list is not None:
+        for domain in mdd_list:
+            if domain == '':
+                vrt += '  <Metadata>\n'
+            elif len(domain) > 4 and domain[0:4] == 'xml:':
+                vrt += '  <Metadata domain="%s" format="xml">\n' % Esc(domain)
+            else:
+                vrt += '  <Metadata domain="%s">\n' % Esc(domain)
+            if len(domain) > 4 and domain[0:4] == 'xml:':
+                vrt += src_ds.GetMetadata_List(domain)[0]
+            else:
+                md = src_ds.GetMetadata(domain)
+                for key in md:
+                    vrt += '    <MDI key="%s">%s</MDI>\n' % (Esc(key), Esc(md[key]))
+            vrt += '  </Metadata>\n'
+
 
     #############################################################################
     #	Process each source layer.
@@ -139,8 +188,35 @@ def ogr2vrt(infile,outfile,argv=" "):
         layerdef = layer.GetLayerDefn()
 
         vrt += '  <OGRVRTLayer name="%s">\n' % Esc(name)
+
+        mdd_list = layer.GetMetadataDomainList()
+        if mdd_list is not None:
+            for domain in mdd_list:
+                if domain == '':
+                    vrt += '    <Metadata>\n'
+                elif len(domain) > 4 and domain[0:4] == 'xml:':
+                    vrt += '    <Metadata domain="%s" format="xml">\n' % Esc(domain)
+                else:
+                    vrt += '    <Metadata domain="%s">\n' % Esc(domain)
+                if len(domain) > 4 and domain[0:4] == 'xml:':
+                    vrt += layer.GetMetadata_List(domain)[0]
+                else:
+                    md = layer.GetMetadata(domain)
+                    for key in md:
+                        vrt += '      <MDI key="%s">%s</MDI>\n' % (Esc(key), Esc(md[key]))
+                vrt += '    </Metadata>\n'
+
+
         vrt += '    <SrcDataSource relativeToVRT="%s" shared="%d">%s</SrcDataSource>\n' \
                % (relative,not schema,Esc(infile))
+
+        if len(openoptions) > 0:
+            vrt += '    <OpenOptions>\n'
+            for option in openoptions:
+                (key, value) = option.split('=')
+                vrt += '        <OOI key="%s">%s</OOI>\n'  % (Esc(key), Esc(value))
+            vrt += '    </OpenOptions>\n'
+
         if schema:
             vrt += '    <SrcLayer>@dummy@</SrcLayer>\n'
         else:
@@ -149,7 +225,8 @@ def ogr2vrt(infile,outfile,argv=" "):
         # Historic format for mono-geometry layers
         if layerdef.GetGeomFieldCount() == 0:
             vrt += '    <GeometryType>wkbNone</GeometryType>\n'
-        elif layerdef.GetGeomFieldCount() == 1:
+        elif layerdef.GetGeomFieldCount() == 1 and \
+             layerdef.GetGeomFieldDefn(0).IsNullable():
             vrt += '    <GeometryType>%s</GeometryType>\n' \
                 % GeomType2Name(layerdef.GetGeomType())
             srs = layer.GetSpatialRef()
@@ -167,7 +244,10 @@ def ogr2vrt(infile,outfile,argv=" "):
         else:
             for fld_index in range(layerdef.GetGeomFieldCount()):
                 src_fd = layerdef.GetGeomFieldDefn( fld_index )
-                vrt += '    <GeometryField name="%s">\n' % src_fd.GetName()
+                vrt += '    <GeometryField name="%s"' % src_fd.GetName()
+                if src_fd.IsNullable() == 0:
+                    vrt += ' nullable="false"'
+                vrt += '>\n'
                 vrt += '      <GeometryType>%s</GeometryType>\n' \
                         % GeomType2Name(src_fd.GetType())
                 srs = src_fd.GetSpatialRef()
@@ -187,6 +267,8 @@ def ogr2vrt(infile,outfile,argv=" "):
             src_fd = layerdef.GetFieldDefn( fld_index )
             if src_fd.GetType() == ogr.OFTInteger:
                 type = 'Integer'
+            elif src_fd.GetType() == ogr.OFTInteger64:
+                type = 'Integer64'
             elif src_fd.GetType() == ogr.OFTString:
                 type = 'String'
             elif src_fd.GetType() == ogr.OFTReal:
@@ -195,6 +277,8 @@ def ogr2vrt(infile,outfile,argv=" "):
                 type = 'StringList'
             elif src_fd.GetType() == ogr.OFTIntegerList:
                 type = 'IntegerList'
+            elif src_fd.GetType() == ogr.OFTInteger64List:
+                type = 'Integer64List'
             elif src_fd.GetType() == ogr.OFTRealList:
                 type = 'RealList'
             elif src_fd.GetType() == ogr.OFTBinary:
@@ -210,12 +294,16 @@ def ogr2vrt(infile,outfile,argv=" "):
 
             vrt += '    <Field name="%s" type="%s"' \
                    % (Esc(src_fd.GetName()), type)
+            if src_fd.GetSubType() != ogr.OFSTNone:
+                vrt += ' subtype="%s"' % ogr.GetFieldSubTypeName(src_fd.GetSubType())
             if not schema:
                 vrt += ' src="%s"' % Esc(src_fd.GetName())
             if src_fd.GetWidth() > 0:
                 vrt += ' width="%d"' % src_fd.GetWidth()
             if src_fd.GetPrecision() > 0:
                 vrt += ' precision="%d"' % src_fd.GetPrecision()
+            if src_fd.IsNullable() == 0:
+                vrt += ' nullable="false"'
             vrt += '/>\n'
 
         if feature_count:
@@ -227,5 +315,5 @@ def ogr2vrt(infile,outfile,argv=" "):
 
     #############################################################################
     # Write vrt
-    print vrt
+
     open(outfile,'w').write(vrt)

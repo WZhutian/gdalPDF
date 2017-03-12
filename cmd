@@ -24,10 +24,9 @@ gdal_rasterize -burn 0 -ot Byte -tr 0.0001 0.0001 node_extent.shp node.tif
 
 
 3.
- gdal_translate
- -of PDF
+ gdal_translate -of PDF
  -a_srs EPSG:4326
- -co OGR_DATASOURCE=node.vrt
+ -co OGR_DATASOURCE=temp.vrt
  -co OGR_DISPLAY_FIELD="FID"
- node.tif
+ temp.tif
  node.pdf

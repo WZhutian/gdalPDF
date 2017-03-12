@@ -3,7 +3,7 @@
     <SrcDataSource relativeToVRT="0" shared="1">F:/GDALpdf/data/road_1.shp</SrcDataSource>
     <SrcLayer>road_1</SrcLayer>
     <GeometryType>wkbLineString</GeometryType>
-    <LayerSRS>GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;WGS_1984&quot;,SPHEROID[&quot;WGS_84&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]]</LayerSRS>
+    <LayerSRS>GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_84",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]</LayerSRS>
     <Field name="osm_id" type="String" src="osm_id" width="11"/>
     <Field name="name" type="String" src="name" width="48"/>
     <Field name="ref" type="String" src="ref" width="16"/>
@@ -13,15 +13,15 @@
     <Field name="tunnel" type="Integer" src="tunnel" width="9"/>
     <Field name="maxspeed" type="Integer" src="maxspeed" width="9"/>
     <Field name="lanenumber" type="Integer" src="lanenumber" width="9"/>
-    <Field name="ƽ" type="Integer" src="ƽ" width="9"/>
-    <Field name="ʱ" type="Real" src="ʱ" width="19" precision="11"/>
-    <Field name="ͨ" type="Integer" src="ͨ" width="9"/>
-    <Field name="" type="Integer" src="" width="9"/>
+    <Field name="平均车" type="Integer" src="平均车" width="9"/>
+    <Field name="所需时" type="Real" src="所需时" width="19" precision="11"/>
+    <Field name="交通流" type="Integer" src="交通流" width="9"/>
+    <Field name="斑马线" type="Integer" src="斑马线" width="9"/>
     <Field name="Shape_Leng" type="Real" src="Shape_Leng" width="19" precision="11"/>
     <Field name="Shape_Le_1" type="Real" src="Shape_Le_1" width="19" precision="11"/>
-    <Field name="ת" type="Integer" src="ת" width="4"/>
-    <Field name="" type="Integer" src="" width="4"/>
-    <Field name="̵" type="Integer" src="̵" width="4"/>
+    <Field name="转弯限制" type="Integer" src="转弯限制" width="4"/>
+    <Field name="红灯" type="Integer" src="红灯" width="4"/>
+    <Field name="绿灯" type="Integer" src="绿灯" width="4"/>
     <Field name="pcu" type="Integer" src="pcu" width="4"/>
     <Field name="ID" type="Integer" src="ID" width="4"/>
   </OGRVRTLayer>

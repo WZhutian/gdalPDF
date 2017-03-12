@@ -2,16 +2,12 @@
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
-import codecs
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 import json
 class Shapefile(object):
     def __init__(self,path):
         #支持中文路径,使属性表字段支持中文
         gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8","YES")
-        gdal.SetConfigOption("SHAPE_ENCODING","UTF-8")
+        gdal.SetConfigOption("SHAPE_ENCODING","")
         # #注册所有的驱动
         ogr.RegisterAll()
         #数据格式的驱动
@@ -103,12 +99,9 @@ if __name__=='__main__':
     # print str(shp.getTableInfo()).decode('string_escape') #一种方法
     # print shp.getGeometryInfo()
     a = shp.getTableInfo()[10]
-    print a.decode('cp936')
     print repr(a)
-    print repr('所需时')
-    print sys.getdefaultencoding()
-    # print a.encode('utf-8')
-    # codecs.open('test.txt','w','cp936').write(a)
+    print isinstance(a, basestring)
+
     # print shp.getAttributeInfo()
 
     shp.delete()
