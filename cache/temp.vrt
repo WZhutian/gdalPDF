@@ -1,0 +1,28 @@
+<OGRVRTDataSource>
+  <OGRVRTLayer name="road_1">
+    <SrcDataSource relativeToVRT="0" shared="1">F:/GDALpdf/data/road_1.shp</SrcDataSource>
+    <SrcLayer>road_1</SrcLayer>
+    <GeometryType>wkbLineString</GeometryType>
+    <LayerSRS>GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_84",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]</LayerSRS>
+    <Field name="osm_id" type="String" src="osm_id" width="11"/>
+    <Field name="name" type="String" src="name" width="48"/>
+    <Field name="ref" type="String" src="ref" width="16"/>
+    <Field name="type" type="String" src="type" width="16"/>
+    <Field name="oneway" type="Integer" src="oneway" width="9"/>
+    <Field name="bridge" type="Integer" src="bridge" width="9"/>
+    <Field name="tunnel" type="Integer" src="tunnel" width="9"/>
+    <Field name="maxspeed" type="Integer" src="maxspeed" width="9"/>
+    <Field name="lanenumber" type="Integer" src="lanenumber" width="9"/>
+    <Field name="å¹³å‡è½¦" type="Integer" src="Æ½¾ù³µ" width="9"/>
+    <Field name="æ‰€éœ€æ—¶" type="Real" src="ËùÐèÊ±" width="19" precision="11"/>
+    <Field name="äº¤é€šæµ" type="Integer" src="½»Í¨Á÷" width="9"/>
+    <Field name="æ–‘é©¬çº¿" type="Integer" src="°ßÂíÏß" width="9"/>
+    <Field name="Shape_Leng" type="Real" src="Shape_Leng" width="19" precision="11"/>
+    <Field name="Shape_Le_1" type="Real" src="Shape_Le_1" width="19" precision="11"/>
+    <Field name="è½¬å¼¯é™åˆ¶" type="Integer" src="×ªÍäÏÞÖÆ" width="4"/>
+    <Field name="çº¢ç¯" type="Integer" src="ºìµÆ" width="4"/>
+    <Field name="ç»¿ç¯" type="Integer" src="ÂÌµÆ" width="4"/>
+    <Field name="pcu" type="Integer" src="pcu" width="4"/>
+    <Field name="ID" type="Integer" src="ID" width="4"/>
+  </OGRVRTLayer>
+</OGRVRTDataSource>
