@@ -1,11 +1,32 @@
 # -*- coding:utf-8 -*-
-import gdal
-import os,sys
-# print os.path.exists('123')
-def a(bmcm,d,de,e):
-    return 123
-a(1)
-# os.mkdir('123')
-# print u'中文'.encode('utf-8')
-# print gdal.CPLES_XML
-# print gdal.EscapeString( "中文在", gdal.CPLES_XML )
+from osgeo import gdal, ogr
+import os,math
+
+vector_fn = './data/road_1.shp'
+source_ds = ogr.Open(vector_fn)
+source_layer = source_ds.GetLayer()
+
+driver = ogr.GetDriverByName("ESRI Shapefile")
+
+extfile = 'rect_demo.shp'
+if os.access( extfile, os.F_OK ):
+    driver.DeleteDataSource( extfile )
+
+extent = source_layer.GetExtent()
+
+newds = driver.CreateDataSource(extfile)
+layernew = newds.CreateLayer('rect',source_layer.GetSpatialRef(),ogr.wkbPolygon)
+width = math.fabs(extent[1]-extent[0])
+height = math.fabs(extent[3]-extent[2])
+tw = width/2
+th = width/2
+extnew = extent[0]+tw
+wkt = 'POLYGON ((%f %f,%f %f,%f %f,%f %f,%f %f))' % (extent[0],extent[3],
+    extent[1],extent[3], extent[1],extent[2],
+    extent[0],extent[2], extent[0],extent[3])
+
+geom = ogr.CreateGeometryFromWkt(wkt)
+feat = ogr.Feature(layernew.GetLayerDefn())
+feat.SetGeometry(geom)
+layernew.CreateFeature(feat)
+newds.Destroy()

@@ -24,5 +24,7 @@
     <Field name="ç»¿ç¯" type="Integer" src="ÂÌµÆ" width="4"/>
     <Field name="pcu" type="Integer" src="pcu" width="4"/>
     <Field name="ID" type="Integer" src="ID" width="4"/>
+    <SrcSQL>SELECT *,'BRUSH(fc:#367C23);PEN(c:"#BB0000",w:20px)' AS OGR_STYLE FROM road_1 </SrcSQL>
+    <SrcSQL>SELECT *,'BRUSH(fc:#367C23);PEN(c:"#B7B7B7",w:1px)' AS OGR_STYLE FROM road_1 WHERE bridge = '0'</SrcSQL>
   </OGRVRTLayer>
 </OGRVRTDataSource>

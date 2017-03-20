@@ -95,6 +95,7 @@ class Shapefile(object):
 if __name__=='__main__':
     # shp = Shapefile('D:\\GIS数据\\china\\China.shp')
     shp = Shapefile('F:\\PYX\\data\\road_1.shp')
+    print shp.getMapInfo()[0]
     # shp = Shapefile('F:\\PYX\\data\\node.shp')
     # shp.getFeaturesInfo()
     # print type(shp.getMapInfo()[0].ExportToWkt())
@@ -102,11 +103,11 @@ if __name__=='__main__':
     # print shp.getAttributeInfo()
     # print str(shp.getTableInfo()).decode('string_escape') #一种方法
     # print shp.getGeometryInfo()
-    a = shp.getTableInfo()[10]
-    print a.decode('cp936')
-    print repr(a)
-    print repr('所需时')
-    print sys.getdefaultencoding()
+    # a = shp.getTableInfo()[10]
+    # print a.decode('cp936')
+    # print repr(a)
+    # print repr('所需时')
+    # print sys.getdefaultencoding()
     # print a.encode('utf-8')
     # codecs.open('test.txt','w','cp936').write(a)
     # print shp.getAttributeInfo()
