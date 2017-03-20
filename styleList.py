@@ -12,67 +12,43 @@ class OgrFeatureStyle(object):
         if value:
             self.str += "," + typeName + ":\"" + value + "\""
 
-    def setPen(self,c="#FFFFFF",w="1px",\
-        p="",penId="",cap="",j="",dp="",l=""):
+    '''
+    c="#FFFFFF",w="1px",p="",penId="",cap="",j="",dp="",l=""
+    '''
+    def setPen(self,c="#FFFFFF",w="1px",**kwargs):
         self.str = "PEN(c:" + c + ",w:" + w
-        self.add(p,'p')
-        self.add(penId,'id')
-        self.add(cap,'cap')
-        self.add(j,'j')
-        self.add(dp,'dp')
-        self.add(l,'l')
+        for key in kwargs:
+            self.add(kwargs[key],key)
         self.str += ")"
         self.pen = self.str
-
-    def setBrush(self,fc="#808080",bc="#808080",\
-        brushId="",a="",s="",dx="",dy="",l=""):
+    '''
+        fc="#808080",bc="#808080",brushId="",a="",s="",dx="",dy="",l=""
+    '''
+    def setBrush(self,fc="#808080",bc="#808080",**kwargs):
         self.str = "BRUSH(fc:" + fc + ",bc:" + bc
-        self.add(brushId,'id')
-        self.add(a,'a')
-        self.add(s,'s')
-        self.add(dx,'dx')
-        self.add(dy,'dy')
-        self.add(l,'l')
+        for key in kwargs:
+            self.add(kwargs[key],key)
         self.str += ")"
         self.brush = self.str
 
-    def setSymbol(self,symbolId="",a="",c="#000000",\
-        o="",s="",dx="",dy="",ds="",dp="",di="",l=""):
+    '''
+        symbolId="",a="",c="#000000",o="",s="",dx="",dy="",ds="",dp="",di="",l=""
+    '''
+    def setSymbol(self,c="#000000",**kwargs):
         self.str = "SYMBOL(c:" + c
-        self.add(symbolId,'id')
-        self.add(a,'a')
-        self.add(o,'o')
-        self.add(s,'s')
-        self.add(dx,'dx')
-        self.add(dy,'dy')
-        self.add(ds,'ds')
-        self.add(dp,'dp')
-        self.add(di,'di')
-        self.add(l,'l')
+        for key in kwargs:
+            self.add(kwargs[key],key)
         self.str += ")"
         self.symbol = self.str
 
-    def setLabel(self,f="",s="",t="",a="",c="#000000",\
-        b="",o="",h="",w="",st="",m="",p="",dx="",dy="",dp="",bo="",it="",un="",l=""):
+    '''
+        f="",s="",t="",a="",c="#000000",b="",o="",h="",w="",st="",m="",p="",
+        dx="",dy="",dp="",bo="",it="",un="",l=""
+    '''
+    def setLabel(self,c="#000000",**kwargs):
         self.str = "LABEL(c:" + c
-        self.add(f,'f')
-        self.add(s,'s')
-        self.add(t,'t')
-        self.add(a,'a')
-        self.add(b,'b')
-        self.add(o,'o')
-        self.add(h,'h')
-        self.add(w,'w')
-        self.add(st,'st')
-        self.add(m,'m')
-        self.add(p,'p')
-        self.add(dx,'dx')
-        self.add(dy,'dy')
-        self.add(dp,'dp')
-        self.add(bo,'bo')
-        self.add(it,'it')
-        self.add(un,'un')
-        self.add(l,'l')
+        for key in kwargs:
+            self.add(kwargs[key],key)
         self.str += ")"
         self.label = self.str
 
@@ -87,6 +63,7 @@ class OgrFeatureStyle(object):
             return self.label
 #执行测试区域
 if __name__=='__main__':
-    test = OgrFeatureStyle('line')
-    test.setPen()
+    test = OgrFeatureStyle('polygon')
+    test.setBrush("#d70000","#d70000")
+    test.setPen("#1382e9")
     print test.getSQL()

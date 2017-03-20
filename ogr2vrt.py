@@ -51,7 +51,7 @@ class Ogr2vrt(object):
         return srs
     #############################################################################
     # Argument processing.
-    def __init__(self,infile,outfile,argv=" "):
+    def __init__(self,infile,outfile,sqlStyleList,argv=" "):
         layer_list = []
         relative = "0"
         schema = 0
@@ -87,6 +87,7 @@ class Ogr2vrt(object):
         vrt = '<OGRVRTDataSource>\n'
 
         #############################################################################
+        styleListIndex = 0
         # Open the datasource to read.
         for fileName in infile:
             layer_list=[]
@@ -188,8 +189,9 @@ class Ogr2vrt(object):
                 # 额外
                 #
                 # 添加SQL语句
-                vrt += "    <SrcSQL>SELECT *,'BRUSH(fc:#367C23);PEN(c:\"#BB0000\",w:20px)' AS OGR_STYLE FROM "+name+" </SrcSQL>\n"
-                vrt += "    <SrcSQL>SELECT *,'BRUSH(fc:#367C23);PEN(c:\"#B7B7B7\",w:1px)' AS OGR_STYLE FROM "+name+" WHERE bridge = '0'</SrcSQL>\n"
+                vrt += "    <SrcSQL>SELECT *,'"+sqlStyleList[styleListIndex]+"' AS OGR_STYLE FROM "+name+" </SrcSQL>\n"
+                styleListIndex += 1
+                # vrt += "    <SrcSQL>SELECT *,'PEN(c:\"#B7B7B7\",w:1px)' AS OGR_STYLE FROM "+name+" WHERE bridge = '0'</SrcSQL>\n"
                 vrt += '  </OGRVRTLayer>\n'
 
         vrt += '</OGRVRTDataSource>\n'
